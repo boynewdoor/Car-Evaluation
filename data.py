@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 from scipy.stats import chi2_contingency
 import os
 
@@ -29,14 +32,6 @@ print("\n")
 # Carregando o arquivo CSV
 file_path = "data.csv"
 df = pd.read_csv(file_path)
-
-# Apply Label Encoding for 'buying' and 'safety' (ordinal variables)
-#label_encoder = LabelEncoder()
-#df['buying'] = label_encoder.fit_transform(df['buying'])
-#df['maint'] = label_encoder.fit_transform(df['safety'])
-
-# Apply One-Hot Encoding for 'maint', 'doors', 'persons', 'lug_boot' (categorical variables)
-#df_encoded = pd.get_dummies(df, columns=['maint', 'doors', 'persons', 'lug_boot'], drop_first=True)
 
 # Calculando a porcentagem de valores únicos para cada coluna
 unique_percentages = {}
@@ -333,6 +328,10 @@ X_encoded = X.apply(label_encoder.fit_transform)
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42)
 
+### RANDOM FOREST ###
+
+print("### RANDOM FOREST ###")
+
 # Initialize and train a Random Forest classifier
 rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_classifier.fit(X_train, y_train)
@@ -345,3 +344,92 @@ accuracy = accuracy_score(y_test, y_pred)
 accuracy_percentage = "{:.3%}".format(accuracy)
 print(f'Accuracy: {accuracy}' + ' = ' + f'{accuracy_percentage}')
 print("\n")
+
+# Avaliação do modelo de Random Forest
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# AUC-ROC para um problema de classificação multiclasse
+y_prob = rf_classifier.predict_proba(X_test)  # Probabilidades de classe
+auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+print("AUC-ROC:", auc_roc)
+print("\n")
+
+### SVM - SUPPORT VECTOR MACHINE ###
+
+print("\n### SVM - SUPPORT VECTOR MACHINE ###")
+
+# Initialize and train a Support Vector Machine classifier
+svm_classifier = SVC(random_state=42)
+svm_classifier.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = svm_classifier.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+accuracy_percentage = "{:.3%}".format(accuracy)
+print(f'Accuracy: {accuracy}' + ' = ' + f'{accuracy_percentage}')
+print("\n")
+
+# Avaliação do modelo de Support Vector Machine
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# AUC-ROC para um problema de classificação multiclasse
+y_prob = svm_classifier.decision_function(X_test)  # Função de decisão para probabilidades
+auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+print("AUC-ROC:", auc_roc)
+print("\n")
+
+### NEURAL NETWORKS ###
+
+print("\n### NEURAL NETWORKS ###")
+
+# Inicializando o modelo MLP
+mlp_model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, random_state=42)
+
+# Treinando o modelo
+mlp_model.fit(X_train, y_train)
+
+# Fazendo previsões no conjunto de teste
+y_pred_mlp = mlp_model.predict(X_test)
+
+# Avaliando o modelo
+accuracy_mlp = accuracy_score(y_test, y_pred_mlp)
+print(f'Accuracy (MLP): {accuracy_mlp:.3f}')
+print("\n")
+
+# Classification Report
+print("Classification Report (MLP):")
+print(classification_report(y_test, y_pred_mlp))
+
+# AUC-ROC
+y_prob_mlp = mlp_model.predict_proba(X_test)  # Probabilidades de classe
+auc_roc_mlp = roc_auc_score(pd.get_dummies(y_test), y_prob_mlp, multi_class='ovr')
+print("AUC-ROC (MLP):", auc_roc_mlp)
+print("\n")
+
+### DECISION TREES ### 
+
+print("\n### DECISION TREES ###")
+
+# Inicializando o modelo de Árvore de Decisão
+dt_model = DecisionTreeClassifier(random_state=42)
+
+# Treinando o modelo
+dt_model.fit(X_train, y_train)
+
+# Fazendo previsões no conjunto de teste
+y_pred_dt = dt_model.predict(X_test)
+
+# Avaliando o modelo
+accuracy_dt = accuracy_score(y_test, y_pred_dt)
+print(f'Accuracy (Decision Tree): {accuracy_dt:.3f}')
+print("\n")
+
+# Classification Report
+print("Classification Report (Decision Tree):")
+print(classification_report(y_test, y_pred_dt))
+print("\n")
+
