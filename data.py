@@ -362,7 +362,7 @@ rf_classifier.fit(X_train, y_train)
 y_pred = rf_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy_rf = accuracy_score(y_test, y_pred)
+accuracy_rf = accuracy_score(y_test, y_pred).round(3)
 accuracy_percentage_rf = "{:.3%}".format(accuracy_rf)
 print(f'Accuracy: {accuracy_rf}' + ' = ' + f'{accuracy_percentage_rf}')
 print("\n")
@@ -374,7 +374,7 @@ print(classification_report_str)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = rf_classifier.predict_proba(X_test)  # Probabilidades de classe
-auc_roc_rf = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+auc_roc_rf = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr').round(3)
 print("AUC-ROC:", auc_roc_rf)
 print("\n")
 
@@ -405,7 +405,7 @@ svm_classifier.fit(X_train, y_train)
 y_pred = svm_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy_svm = accuracy_score(y_test, y_pred)
+accuracy_svm = accuracy_score(y_test, y_pred).round(3)
 accuracy_percentage_svm = "{:.3%}".format(accuracy_svm)
 print(f'Accuracy: {accuracy_svm}' + ' = ' + f'{accuracy_percentage_svm}')
 print("\n")
@@ -417,7 +417,7 @@ print(classification_report_str1)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = svm_classifier.decision_function(X_test)  # Função de decisão para probabilidades
-auc_roc_svm = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+auc_roc_svm = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr').round(3)
 print("AUC-ROC:", auc_roc_svm)
 print("\n")
 
@@ -450,7 +450,7 @@ mlp_model.fit(X_train, y_train)
 y_pred_mlp = mlp_model.predict(X_test)
 
 # Avaliando o modelo
-accuracy_mlp = accuracy_score(y_test, y_pred_mlp)
+accuracy_mlp = accuracy_score(y_test, y_pred_mlp).round(3)
 accuracy_percentage_mlp = "{:.3%}".format(accuracy_mlp)
 print(f'Accuracy (MLP): {accuracy_mlp}' + ' = ' + f'{accuracy_percentage_mlp}')
 print("\n")
@@ -462,7 +462,7 @@ print(classification_report_str2)
 
 # AUC-ROC
 y_prob_mlp = mlp_model.predict_proba(X_test)  # Probabilidades de classe
-auc_roc_mlp = roc_auc_score(pd.get_dummies(y_test), y_prob_mlp, multi_class='ovr')
+auc_roc_mlp = roc_auc_score(pd.get_dummies(y_test), y_prob_mlp, multi_class='ovr').round(3)
 print("AUC-ROC (MLP):", auc_roc_mlp)
 print("\n")
 
@@ -495,7 +495,7 @@ dt_model.fit(X_train, y_train)
 y_pred_dt = dt_model.predict(X_test)
 
 # Avaliando o modelo
-accuracy_dt = accuracy_score(y_test, y_pred_dt)
+accuracy_dt = accuracy_score(y_test, y_pred_dt).round(3)
 accuracy_percentage_dt = "{:.3%}".format(accuracy_dt)
 print(f'Accuracy (Decision Tree): {accuracy_dt}' + ' = ' + f'{accuracy_percentage_dt}')
 print("\n")
@@ -527,7 +527,7 @@ model_data = [
     ("RANDOM FOREST", accuracy_rf, accuracy_percentage_rf, auc_roc_rf),
     ("SVM", accuracy_svm, accuracy_percentage_svm, auc_roc_svm),
     ("NEURAL NETWORKS", accuracy_mlp, accuracy_percentage_mlp, auc_roc_mlp),
-    ("DECISION TREE", accuracy_dt, accuracy_percentage_dt,),
+    ("DECISION TREE", accuracy_dt, accuracy_percentage_dt),
 ]
 
 # Define headers for the table
@@ -542,5 +542,12 @@ print("### MODELS TABLES ###\n")
 print(table)
 
 # Compare precision scores
-best_model = max(model_data, key=lambda x: x[1])
-print(f"\nThe best model based on precision score is {best_model[0]} with a precision score of {best_model[1]:.2f} corresponding to a percentage of {best_model[2]}%.")
+best_model_precision = max(model_data, key=lambda x: x[1])
+print(f"\nThe best model based on precision score is {best_model_precision[0]} with a precision score of {best_model_precision[1]:.2f} corresponding to a percentage of {best_model_precision[2]}%.")
+
+# Compare AUC-ROC scores
+try:
+    best_model_auc_roc = max((model for model in model_data if len(model) == len(headers)), key=lambda x: x[3])
+    print(f"\nThe best model based on AUC-ROC score is {best_model_auc_roc[0]} with an AUC-ROC score of {best_model_auc_roc[3]:.2f}.\n")
+except ValueError:
+    print("Error: AUC-ROC values are not available for any model.")
