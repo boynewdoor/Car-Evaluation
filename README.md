@@ -1,6 +1,8 @@
 ## Project Designed in order to fullfil a project for Data Mining
 ## Developed by Diogo Porta-Nova
-### CAR-EVALUATION DATABASE
+### CAR-EVALUATION Dataset
+
+## 1728 instances, 6 attributes, no missing values
 
 ## Execution tips:
 - Install python
@@ -14,3 +16,9 @@
 - Descriptive Statistics saved in a table and converted to a .png file (specific folder)
 - Unique Percentages and Counts saved in tables and converted to .png files (specific folder)
 - Models classification reports saved in tables and converted to .png files (specific folder)
+
+## Classification Models:
+- Random Forest
+- Support Vector Machine - SVM
+- Decision Trees
+- Neural Networks
