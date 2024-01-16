@@ -1,4 +1,4 @@
-## Project Designed in order to fullfil a project for Data Mining
+## Project Designed for Data Mining Article
 ## Developed by Diogo Porta-Nova
 ### CAR-EVALUATION Dataset
 
