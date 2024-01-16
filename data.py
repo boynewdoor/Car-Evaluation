@@ -12,6 +12,9 @@ from scipy.stats import chi2_contingency
 import os
 import numpy as np
 from io import StringIO
+from tabulate import tabulate
+
+plt.rcParams['figure.max_open_warning'] = 50  # Set the threshold to 50 or a value suitable for your case
 
 # Carregando o arquivo de dados
 data_file = "car.data"
@@ -359,9 +362,9 @@ rf_classifier.fit(X_train, y_train)
 y_pred = rf_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-accuracy_percentage = "{:.3%}".format(accuracy)
-print(f'Accuracy: {accuracy}' + ' = ' + f'{accuracy_percentage}')
+accuracy_rf = accuracy_score(y_test, y_pred)
+accuracy_percentage_rf = "{:.3%}".format(accuracy_rf)
+print(f'Accuracy: {accuracy_rf}' + ' = ' + f'{accuracy_percentage_rf}')
 print("\n")
 
 # Avaliação do modelo de Random Forest
@@ -371,8 +374,8 @@ print(classification_report_str)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = rf_classifier.predict_proba(X_test)  # Probabilidades de classe
-auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
-print("AUC-ROC:", auc_roc)
+auc_roc_rf = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+print("AUC-ROC:", auc_roc_rf)
 print("\n")
 
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
@@ -402,9 +405,9 @@ svm_classifier.fit(X_train, y_train)
 y_pred = svm_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-accuracy_percentage = "{:.3%}".format(accuracy)
-print(f'Accuracy: {accuracy}' + ' = ' + f'{accuracy_percentage}')
+accuracy_svm = accuracy_score(y_test, y_pred)
+accuracy_percentage_svm = "{:.3%}".format(accuracy_svm)
+print(f'Accuracy: {accuracy_svm}' + ' = ' + f'{accuracy_percentage_svm}')
 print("\n")
 
 # Avaliação do modelo de Support Vector Machine
@@ -414,8 +417,8 @@ print(classification_report_str1)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = svm_classifier.decision_function(X_test)  # Função de decisão para probabilidades
-auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
-print("AUC-ROC:", auc_roc)
+auc_roc_svm = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
+print("AUC-ROC:", auc_roc_svm)
 print("\n")
 
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
@@ -448,7 +451,8 @@ y_pred_mlp = mlp_model.predict(X_test)
 
 # Avaliando o modelo
 accuracy_mlp = accuracy_score(y_test, y_pred_mlp)
-print(f'Accuracy (MLP): {accuracy_mlp:.3f}')
+accuracy_percentage_mlp = "{:.3%}".format(accuracy_mlp)
+print(f'Accuracy (MLP): {accuracy_mlp}' + ' = ' + f'{accuracy_percentage_mlp}')
 print("\n")
 
 # Classification Report
@@ -492,7 +496,8 @@ y_pred_dt = dt_model.predict(X_test)
 
 # Avaliando o modelo
 accuracy_dt = accuracy_score(y_test, y_pred_dt)
-print(f'Accuracy (Decision Tree): {accuracy_dt:.3f}')
+accuracy_percentage_dt = "{:.3%}".format(accuracy_dt)
+print(f'Accuracy (Decision Tree): {accuracy_dt}' + ' = ' + f'{accuracy_percentage_dt}')
 print("\n")
 
 # Classification Report
@@ -516,3 +521,26 @@ ax.axis('off')
 ax.table(cellText=classification_report_df3.values, colLabels=classification_report_df3.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(models_folder, 'tabela_classification_report_decision_trees.png'))
 
+# table of models with precisions
+
+model_data = [
+    ("RANDOM FOREST", accuracy_rf, accuracy_percentage_rf, auc_roc_rf),
+    ("SVM", accuracy_svm, accuracy_percentage_svm, auc_roc_svm),
+    ("NEURAL NETWORKS", accuracy_mlp, accuracy_percentage_mlp, auc_roc_mlp),
+    ("DECISION TREE", accuracy_dt, accuracy_percentage_dt,),
+]
+
+# Define headers for the table
+headers = ["Model", "Precision Score", "Percentage", "AUC-ROC"]
+
+# Create the table using tabulate
+table = tabulate(model_data, headers=headers, tablefmt="pipe")
+
+print("### MODELS TABLES ###\n")
+
+# Print the table
+print(table)
+
+# Compare precision scores
+best_model = max(model_data, key=lambda x: x[1])
+print(f"\nThe best model based on precision score is {best_model[0]} with a precision score of {best_model[1]:.2f} corresponding to a percentage of {best_model[2]}%.")
