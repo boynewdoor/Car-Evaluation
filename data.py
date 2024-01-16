@@ -378,7 +378,7 @@ print("\n")
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df = pd.read_fwf(StringIO(classification_report_str), index_col=0)
 # Adicionar a coluna com os valores especificados no início da tabela
-classification_report_df.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+classification_report_df.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
 # Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df.columns = ['' if col == 'Header_Column' else col for col in classification_report_df.columns]
 # Substituir "nan" por uma string vazia
@@ -421,7 +421,7 @@ print("\n")
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df1 = pd.read_fwf(StringIO(classification_report_str1), index_col=0)
 # Adicionar a coluna com os valores especificados no início da tabela
-classification_report_df1.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+classification_report_df1.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
 # Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df1.columns = ['' if col == 'Header_Column' else col for col in classification_report_df1.columns]
 # Substituir "nan" por uma string vazia
@@ -465,7 +465,7 @@ print("\n")
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df2 = pd.read_fwf(StringIO(classification_report_str2), index_col=0)
 # Adicionar a coluna com os valores especificados no início da tabela
-classification_report_df2.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+classification_report_df2.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
 # Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df2.columns = ['' if col == 'Header_Column' else col for col in classification_report_df2.columns]
 # Substituir "nan" por uma string vazia
@@ -504,7 +504,7 @@ print("\n")
 # Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df3 = pd.read_fwf(StringIO(classification_report_str3), index_col=0)
 # Adicionar a coluna com os valores especificados no início da tabela
-classification_report_df3.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+classification_report_df3.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
 # Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df3.columns = ['' if col == 'Header_Column' else col for col in classification_report_df3.columns]
 # Substituir "nan" por uma string vazia
