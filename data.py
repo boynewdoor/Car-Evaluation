@@ -10,6 +10,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 from scipy.stats import chi2_contingency
 import os
+import numpy as np
+from io import StringIO
 
 # Carregando o arquivo de dados
 data_file = "car.data"
@@ -33,6 +35,9 @@ print("\n")
 file_path = "data.csv"
 df = pd.read_csv(file_path)
 
+unique_percentages_folder = "unique_percentages"
+os.makedirs(unique_percentages_folder, exist_ok=True)
+
 # Calculando a porcentagem de valores únicos para cada coluna
 unique_percentages = {}
 total_rows = len(df)
@@ -42,15 +47,46 @@ for column in df.columns:
     percentages = (counts / total_rows * 100).round(3).astype(str) + " %"
     unique_percentages[column] = pd.concat([counts, percentages], axis=1, keys=['Count', 'Percentage']).rename_axis(None)
 
-# Imprimindo os resultados
+# Remove the 'class' header
+    if 'class' in unique_percentages[column].index:
+        unique_percentages[column].index = ['' if idx == 'class' else idx for idx in unique_percentages[column].index]
+
+# Salvando tabelas como imagens .png
 for column, result_df in unique_percentages.items():
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.axis('off')
+    ax.table(cellText=result_df.values, colLabels=result_df.columns, rowLabels=result_df.index, cellLoc='center', loc='center')
+    plt.savefig(os.path.join(unique_percentages_folder, f'tabela_{column}_unique_percentages.png'))
     print(f"Column: {column}")
     print(result_df)
     print("\n")
 
 # 1. Descriptive Statistics
 print("1. Descriptive Statistics:")
-print(df.describe())
+descriptive_statistics_folder = "descriptive_statistics"
+os.makedirs(descriptive_statistics_folder, exist_ok=True)
+desc_stats = df.describe()
+# Adiciona uma coluna antes de cada coluna nas estatísticas descritivas
+# Adiciona uma coluna com um cabeçalho aleatório antes da coluna 'buying'
+# Cria um cabeçalho aleatório
+random_header = np.random.choice(['Random_Header'])
+
+# Adiciona uma coluna com os valores 'count', 'unique', 'top' e 'freq'
+desc_stats[random_header] = ['count', 'unique', 'top', 'freq']
+
+# Reorganiza as colunas para que 'Random_Header' esteja antes de 'buying'
+desc_stats = desc_stats[['Random_Header'] + [col for col in desc_stats.columns if col != 'Random_Header']]
+
+# Remove o cabeçalho da coluna 'Random_Header'
+desc_stats.columns = ['' if col == 'Random_Header' else col for col in desc_stats.columns]
+
+table_desc_stats = desc_stats.to_html
+# Salvar tabela HTML como imagem .png
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.axis('off')
+ax.table(cellText=desc_stats.values, colLabels=desc_stats.columns, cellLoc='center', loc='center')
+plt.savefig(os.path.join(descriptive_statistics_folder, 'tabela_desc_stats.png'))
+print(desc_stats)
 print("\n")
 
 # Create folders to save the images
@@ -70,7 +106,7 @@ for column in df.columns[:-1]:  # Excluir a última coluna (classe) para variáv
     # Save the countplot image in the countplot folder
     plt.savefig(os.path.join(countplot_folder, f'countplot_{column}_vs_class.png'))
     
-    plt.show()
+    #plt.show()
 
 # 4. Análise de Outliers
 # - Box plots para cada atributo
@@ -82,7 +118,7 @@ for column in df.columns[:-1]:
     # Save the boxplot image in the boxplot folder
     plt.savefig(os.path.join(boxplot_folder, f'boxplot_{column}_vs_class.png'))
     
-    plt.show()
+    #plt.show()
 
 # 5. Tratamento de Dados Ausentes
 # - Verificando a presença de dados ausentes
@@ -94,112 +130,91 @@ print(missing_data)
 
 # CROSS-TABULATION -> BUYING x Others
 cross_tab = pd.crosstab(df['buying'], df['class'])
-print("\nCross-Tabulation for BUYING x CLASS:")
 print(cross_tab)
 print("\n")
 
 cross_tab1 = pd.crosstab(df['buying'], df['maint'])
-print("\nCross-Tabulation for BUYING x MAINT:")
 print(cross_tab1)
 print("\n")
 
 cross_tab2 = pd.crosstab(df['buying'], df['doors'])
-print("\nCross-Tabulation for BUYING x DOORS:")
 print(cross_tab2)
 print("\n")
 
 cross_tab3 = pd.crosstab(df['buying'], df['persons'])
-print("\nCross-Tabulation for BUYING x PERSONS:")
 print(cross_tab3)
 print("\n")
 
 cross_tab4 = pd.crosstab(df['buying'], df['lug_boot'])
-print("\nCross-Tabulation for BUYING x LUG_BOOT:")
 print(cross_tab4)
 print("\n")
 
 cross_tab5 = pd.crosstab(df['buying'], df['safety'])
-print("\nCross-Tabulation for BUYING x SAFETY:")
 print(cross_tab5)
 print("\n")
 
 # CROSS-TABULATION -> MAINT x Others
 cross_tab6 = pd.crosstab(df['maint'], df['class'])
-print("\nCross-Tabulation for MAINT x CLASS:")
 print(cross_tab6)
 print("\n")
 
 cross_tab7 = pd.crosstab(df['maint'], df['doors'])
-print("\nCross-Tabulation for MAINT x DOORS:")
 print(cross_tab7)
 print("\n")
 
 cross_tab8 = pd.crosstab(df['maint'], df['persons'])
-print("\nCross-Tabulation for MAINT x PERSONS:")
 print(cross_tab8)
 print("\n")
 
 cross_tab9 = pd.crosstab(df['maint'], df['lug_boot'])
-print("\nCross-Tabulation for MAINT x LUG_BOOT:")
 print(cross_tab9)
 print("\n")
 
 cross_tab10 = pd.crosstab(df['maint'], df['safety'])
-print("\nCross-Tabulation for MAINT x SAFETY:")
 print(cross_tab10)
 print("\n")
 
 # CROSS-TABULATION -> DOORS x Others
 cross_tab11 = pd.crosstab(df['doors'], df['class'])
-print("\nCross-Tabulation for DOORS x CLASS:")
 print(cross_tab11)
 print("\n")
 
 cross_tab12 = pd.crosstab(df['doors'], df['persons'])
-print("\nCross-Tabulation for DOORS x PERSONS:")
 print(cross_tab12)
 print("\n")
 
 cross_tab13 = pd.crosstab(df['doors'], df['lug_boot'])
-print("\nCross-Tabulation for DOORS x LUG_BOOT:")
 print(cross_tab13)
 print("\n")
 
 cross_tab14 = pd.crosstab(df['doors'], df['safety'])
-print("\nCross-Tabulation for DOORS x SAFETY:")
 print(cross_tab14)
 print("\n")
 
 # CROSS-TABULATION -> PERSONS x Others
 cross_tab15 = pd.crosstab(df['persons'], df['class'])
-print("\nCross-Tabulation for PERSONS x CLASS:")
 print(cross_tab15)
 print("\n")
 
 cross_tab16 = pd.crosstab(df['persons'], df['lug_boot'])
-print("\nCross-Tabulation for PERSONS x LUG_BOOT:")
 print(cross_tab16)
 print("\n")
 
 cross_tab17 = pd.crosstab(df['persons'], df['safety'])
-print("\nCross-Tabulation for PERSONS x SAFETY:")
 print(cross_tab17)
 print("\n")
 
 # CROSS-TABULATION -> LUG_BOOT x Others
 cross_tab18 = pd.crosstab(df['lug_boot'], df['class'])
-print("\nCross-Tabulation for LUG_BOOT x CLASS:")
 print(cross_tab18)
 print("\n")
 
 cross_tab19 = pd.crosstab(df['lug_boot'], df['safety'])
-print("\nCross-Tabulation for LUG_BOOT x SAFETY:")
 print(cross_tab19)
 print("\n")
 
 # CROSS-TABULATION -> SAFETY x Others
 cross_tab20 = pd.crosstab(df['safety'], df['class'])
-print("\nCross-Tabulation for SAFETY x CLASS:")
 print(cross_tab20)
 print("\n")
 
@@ -316,7 +331,11 @@ print("\nChi-Square Test for SAFETY x CLASS:")
 print(f"Chi2: {chi2}, p-value: {p}")
 print("\n")
 
-### 9. Predictive Modelling -> ACCURACY###
+### 9. Predictive Modelling ###
+
+models_folder = "models"
+
+os.makedirs(models_folder, exist_ok=True)
 
 X = df.drop('class', axis=1)
 y = df['class']
@@ -347,13 +366,29 @@ print("\n")
 
 # Avaliação do modelo de Random Forest
 print("Classification Report:")
-print(classification_report(y_test, y_pred))
+classification_report_str = classification_report(y_test, y_pred)
+print(classification_report_str)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = rf_classifier.predict_proba(X_test)  # Probabilidades de classe
 auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
 print("AUC-ROC:", auc_roc)
 print("\n")
+
+# Converter o relatório de classificação em DataFrame para facilitar a manipulação
+classification_report_df = pd.read_fwf(StringIO(classification_report_str), index_col=0)
+# Adicionar a coluna com os valores especificados no início da tabela
+classification_report_df.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+# Remover o cabeçalho da coluna 'Header_Column'
+classification_report_df.columns = ['' if col == 'Header_Column' else col for col in classification_report_df.columns]
+# Substituir "nan" por uma string vazia
+classification_report_df = classification_report_df.fillna('')
+
+# Criar tabela HTML para o relatório de classificação
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.axis('off')
+ax.table(cellText=classification_report_df.values, colLabels=classification_report_df.columns, cellLoc='center', loc='center')
+plt.savefig(os.path.join(models_folder, 'tabela_classification_report_random_forest.png'))
 
 ### SVM - SUPPORT VECTOR MACHINE ###
 
@@ -374,13 +409,29 @@ print("\n")
 
 # Avaliação do modelo de Support Vector Machine
 print("Classification Report:")
-print(classification_report(y_test, y_pred))
+classification_report_str1 = classification_report(y_test, y_pred)
+print(classification_report_str1)
 
 # AUC-ROC para um problema de classificação multiclasse
 y_prob = svm_classifier.decision_function(X_test)  # Função de decisão para probabilidades
 auc_roc = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr')
 print("AUC-ROC:", auc_roc)
 print("\n")
+
+# Converter o relatório de classificação em DataFrame para facilitar a manipulação
+classification_report_df1 = pd.read_fwf(StringIO(classification_report_str1), index_col=0)
+# Adicionar a coluna com os valores especificados no início da tabela
+classification_report_df1.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+# Remover o cabeçalho da coluna 'Header_Column'
+classification_report_df1.columns = ['' if col == 'Header_Column' else col for col in classification_report_df1.columns]
+# Substituir "nan" por uma string vazia
+classification_report_df1 = classification_report_df1.fillna('')
+
+# Criar tabela HTML para o relatório de classificação
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.axis('off')
+ax.table(cellText=classification_report_df1.values, colLabels=classification_report_df1.columns, cellLoc='center', loc='center')
+plt.savefig(os.path.join(models_folder, 'tabela_classification_report_svm.png'))
 
 ### NEURAL NETWORKS ###
 
@@ -402,13 +453,29 @@ print("\n")
 
 # Classification Report
 print("Classification Report (MLP):")
-print(classification_report(y_test, y_pred_mlp))
+classification_report_str2 = classification_report(y_test, y_pred_mlp)
+print(classification_report_str2)
 
 # AUC-ROC
 y_prob_mlp = mlp_model.predict_proba(X_test)  # Probabilidades de classe
 auc_roc_mlp = roc_auc_score(pd.get_dummies(y_test), y_prob_mlp, multi_class='ovr')
 print("AUC-ROC (MLP):", auc_roc_mlp)
 print("\n")
+
+# Converter o relatório de classificação em DataFrame para facilitar a manipulação
+classification_report_df2 = pd.read_fwf(StringIO(classification_report_str2), index_col=0)
+# Adicionar a coluna com os valores especificados no início da tabela
+classification_report_df2.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+# Remover o cabeçalho da coluna 'Header_Column'
+classification_report_df2.columns = ['' if col == 'Header_Column' else col for col in classification_report_df2.columns]
+# Substituir "nan" por uma string vazia
+classification_report_df2 = classification_report_df2.fillna('')
+
+# Criar tabela HTML para o relatório de classificação
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.axis('off')
+ax.table(cellText=classification_report_df2.values, colLabels=classification_report_df2.columns, cellLoc='center', loc='center')
+plt.savefig(os.path.join(models_folder, 'tabela_classification_report_neural_networks.png'))
 
 ### DECISION TREES ### 
 
@@ -430,6 +497,22 @@ print("\n")
 
 # Classification Report
 print("Classification Report (Decision Tree):")
-print(classification_report(y_test, y_pred_dt))
+classification_report_str3 = classification_report(y_test, y_pred_dt)
+print(classification_report_str3)
 print("\n")
+
+# Converter o relatório de classificação em DataFrame para facilitar a manipulação
+classification_report_df3 = pd.read_fwf(StringIO(classification_report_str3), index_col=0)
+# Adicionar a coluna com os valores especificados no início da tabela
+classification_report_df3.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'goood', 'accuracy', 'macro avg', 'weighted avg'])
+# Remover o cabeçalho da coluna 'Header_Column'
+classification_report_df3.columns = ['' if col == 'Header_Column' else col for col in classification_report_df3.columns]
+# Substituir "nan" por uma string vazia
+classification_report_df3 = classification_report_df3.fillna('')
+
+# Criar tabela HTML para o relatório de classificação
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.axis('off')
+ax.table(cellText=classification_report_df3.values, colLabels=classification_report_df3.columns, cellLoc='center', loc='center')
+plt.savefig(os.path.join(models_folder, 'tabela_classification_report_decision_trees.png'))
 
