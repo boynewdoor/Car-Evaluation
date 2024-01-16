@@ -8,7 +8,7 @@
 - Install python
 - Install pip
 - Install all dependencies such as pandas, matplotlib, seaborn, scikit-learn (or any other requested or necessary)
-- Run your program: ```python .\file.py```
+- Run your program: ```python .\data.py```
 - Check errors and warning if applicable
 
 ## Graphics and tables content:
