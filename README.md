@@ -16,9 +16,17 @@
 - Descriptive Statistics saved in a table and converted to a .png file (specific folder)
 - Unique Percentages and Counts saved in tables and converted to .png files (specific folder)
 - Models classification reports saved in tables and converted to .png files (specific folder)
+- Confusion Matrixes generated and saved in .png files (specific folder)
 
 ## Classification Models:
 - Random Forest
 - Support Vector Machine - SVM
 - Decision Trees
 - Neural Networks
+
+## Performance Analysis
+- Precision
+- Recall
+- F1-Score
+- AUC-ROC
+- Confusion Matrix
