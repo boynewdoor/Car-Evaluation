@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay 
 from scipy.stats import chi2_contingency
 import os
 import numpy as np
@@ -60,6 +60,7 @@ for column, result_df in unique_percentages.items():
     ax.axis('off')
     ax.table(cellText=result_df.values, colLabels=result_df.columns, rowLabels=result_df.index, cellLoc='center', loc='center')
     plt.savefig(os.path.join(unique_percentages_folder, f'tabela_{column}_unique_percentages.png'))
+    plt.close()
     print(f"Column: {column}")
     print(result_df)
     print("\n")
@@ -89,6 +90,7 @@ fig, ax = plt.subplots(figsize=(10, 6))
 ax.axis('off')
 ax.table(cellText=desc_stats.values, colLabels=desc_stats.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(descriptive_statistics_folder, 'tabela_desc_stats.png'))
+plt.close()
 print(desc_stats)
 print("\n")
 
@@ -108,8 +110,7 @@ for column in df.columns[:-1]:  # Excluir a última coluna (classe) para variáv
     
     # Save the countplot image in the countplot folder
     plt.savefig(os.path.join(countplot_folder, f'countplot_{column}_vs_class.png'))
-    
-    #plt.show()
+    plt.close()
 
 # 4. Análise de Outliers
 # - Box plots para cada atributo
@@ -120,14 +121,14 @@ for column in df.columns[:-1]:
     
     # Save the boxplot image in the boxplot folder
     plt.savefig(os.path.join(boxplot_folder, f'boxplot_{column}_vs_class.png'))
-    
-    #plt.show()
+    plt.close()
 
 # 5. Tratamento de Dados Ausentes
 # - Verificando a presença de dados ausentes
 missing_data = df.isnull().sum()
 print("Missing Data:")
 print(missing_data)
+print("\n")
 
 # 7. Cross-Tabulation
 
@@ -392,6 +393,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df.values, colLabels=classification_report_df.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(models_folder, 'tabela_classification_report_random_forest.png'))
+plt.close()
 
 ### SVM - SUPPORT VECTOR MACHINE ###
 
@@ -435,6 +437,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df1.values, colLabels=classification_report_df1.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(models_folder, 'tabela_classification_report_svm.png'))
+plt.close()
 
 ### NEURAL NETWORKS ###
 
@@ -480,6 +483,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df2.values, colLabels=classification_report_df2.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(models_folder, 'tabela_classification_report_neural_networks.png'))
+plt.close()
 
 ### DECISION TREES ### 
 
@@ -520,6 +524,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df3.values, colLabels=classification_report_df3.columns, cellLoc='center', loc='center')
 plt.savefig(os.path.join(models_folder, 'tabela_classification_report_decision_trees.png'))
+plt.close()
 
 # table of models with precisions
 
@@ -551,3 +556,41 @@ try:
     print(f"\nThe best model based on AUC-ROC score is {best_model_auc_roc[0]} with an AUC-ROC score of {best_model_auc_roc[3]:.2f}.\n")
 except ValueError:
     print("Error: AUC-ROC values are not available for any model.")
+
+# Confusion Matrix
+    
+# Create a directory to save confusion matrixes if it doesn't exist
+output_directory = 'confusion_matrixes'
+os.makedirs(output_directory, exist_ok=True)
+    
+print("CONFUSION MATRIXES generating ...\n")
+
+models = {
+    'Random Forest': rf_classifier,
+    'SVM': svm_classifier,
+    'Decision Tree': dt_model,
+    'Neural Network': mlp_model
+}
+
+for model_name, model in models.items():
+    # train the model
+    model.fit(X_train, y_train)
+
+    # make predictions
+    y_pred = model.predict(X_test)
+
+    #calculate the confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+
+    # Print the confusion matrix
+    print(f'### CONFUSION MATRIX - {model_name} ###\n')
+    print("\n")
+    print(cm)
+    print("\n")
+
+    #Visualize the confusion matrix
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=np.unique(y))
+    disp.plot(cmap='Blues', values_format='d')
+    plt.title(f'Matriz de Confusão - {model_name}')
+    plt.savefig(os.path.join(output_directory, f'{model_name}_confusion_matrix.png'))
+    plt.close()  # Close the plot to avoid displaying in the notebook
