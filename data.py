@@ -363,7 +363,7 @@ rf_classifier.fit(X_train, y_train)
 y_pred = rf_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy_rf = accuracy_score(y_test, y_pred).round(3)
+accuracy_rf = round(accuracy_score(y_test, y_pred), 3)
 accuracy_percentage_rf = "{:.3%}".format(accuracy_rf)
 print(f'Accuracy: {accuracy_rf}' + ' = ' + f'{accuracy_percentage_rf}')
 print("\n")
@@ -407,7 +407,7 @@ svm_classifier.fit(X_train, y_train)
 y_pred = svm_classifier.predict(X_test)
 
 # Evaluate the model
-accuracy_svm = accuracy_score(y_test, y_pred).round(3)
+accuracy_svm = round(accuracy_score(y_test, y_pred), 3)
 accuracy_percentage_svm = "{:.3%}".format(accuracy_svm)
 print(f'Accuracy: {accuracy_svm}' + ' = ' + f'{accuracy_percentage_svm}')
 print("\n")
@@ -453,7 +453,7 @@ mlp_model.fit(X_train, y_train)
 y_pred_mlp = mlp_model.predict(X_test)
 
 # Avaliando o modelo
-accuracy_mlp = accuracy_score(y_test, y_pred_mlp).round(3)
+accuracy_mlp = round(accuracy_score(y_test, y_pred_mlp), 3)
 accuracy_percentage_mlp = "{:.3%}".format(accuracy_mlp)
 print(f'Accuracy (MLP): {accuracy_mlp}' + ' = ' + f'{accuracy_percentage_mlp}')
 print("\n")
@@ -499,7 +499,7 @@ dt_model.fit(X_train, y_train)
 y_pred_dt = dt_model.predict(X_test)
 
 # Avaliando o modelo
-accuracy_dt = accuracy_score(y_test, y_pred_dt).round(3)
+accuracy_dt = round(accuracy_score(y_test, y_pred_dt), 3)
 accuracy_percentage_dt = "{:.3%}".format(accuracy_dt)
 print(f'Accuracy (Decision Tree): {accuracy_dt}' + ' = ' + f'{accuracy_percentage_dt}')
 print("\n")
