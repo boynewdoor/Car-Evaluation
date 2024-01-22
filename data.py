@@ -16,32 +16,32 @@ from tabulate import tabulate
 
 plt.rcParams['figure.max_open_warning'] = 50  # Set the threshold to 50 or a value suitable for your case
 
-# Carregando o arquivo de dados
+# Importing data file
 data_file = "car.data"
 data_df = pd.read_csv(data_file, header=None)
 
-# Definindo os atributos desejados na ordem fornecida
+# Definition of desired attributes in a specific order
 desired_attributes = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'class']
 
-# Criando um DataFrame com os atributos como cabeçalhos e os dados de data_df
+# Creating a dataframe
 combined_df = pd.DataFrame(data_df.values, columns=desired_attributes)
 
-# Salvando o DataFrame em um arquivo CSV sem incluir índices
+# Saving a dataframe in .csv format
 combined_df.to_csv("data.csv", index=False)
 
-# Imprimindo os dados originais com os headers desejados
+# Printing the original data
 print("\nOriginal Data:")
 print(data_df.rename(columns=dict(enumerate(desired_attributes))))
 print("\n")
 
-# Carregando o arquivo CSV
+# Import .csv file
 file_path = "data.csv"
 df = pd.read_csv(file_path)
 
 unique_percentages_folder = "unique_percentages"
 os.makedirs(unique_percentages_folder, exist_ok=True)
 
-# Calculando a porcentagem de valores únicos para cada coluna
+# Calculating the percentage of unique values for each column
 unique_percentages = {}
 total_rows = len(df)
 
@@ -54,7 +54,7 @@ for column in df.columns:
     if 'class' in unique_percentages[column].index:
         unique_percentages[column].index = ['' if idx == 'class' else idx for idx in unique_percentages[column].index]
 
-# Salvando tabelas como imagens .png
+# Saving tables has .png images
 for column, result_df in unique_percentages.items():
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.axis('off')
@@ -70,22 +70,14 @@ print("1. Descriptive Statistics:")
 descriptive_statistics_folder = "descriptive_statistics"
 os.makedirs(descriptive_statistics_folder, exist_ok=True)
 desc_stats = df.describe()
-# Adiciona uma coluna antes de cada coluna nas estatísticas descritivas
-# Adiciona uma coluna com um cabeçalho aleatório antes da coluna 'buying'
-# Cria um cabeçalho aleatório
+
 random_header = np.random.choice(['Random_Header'])
-
-# Adiciona uma coluna com os valores 'count', 'unique', 'top' e 'freq'
 desc_stats[random_header] = ['count', 'unique', 'top', 'freq']
-
-# Reorganiza as colunas para que 'Random_Header' esteja antes de 'buying'
 desc_stats = desc_stats[['Random_Header'] + [col for col in desc_stats.columns if col != 'Random_Header']]
-
-# Remove o cabeçalho da coluna 'Random_Header'
 desc_stats.columns = ['' if col == 'Random_Header' else col for col in desc_stats.columns]
 
 table_desc_stats = desc_stats.to_html
-# Salvar tabela HTML como imagem .png
+# Saving HTML table as a .png image
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.axis('off')
 ax.table(cellText=desc_stats.values, colLabels=desc_stats.columns, cellLoc='center', loc='center')
@@ -101,9 +93,9 @@ boxplot_folder = "boxplot"
 os.makedirs(countplot_folder, exist_ok=True)
 os.makedirs(boxplot_folder, exist_ok=True)
 
-# 2. Visualização de Dados
-# - Gráficos de contagem para variáveis categóricas
-for column in df.columns[:-1]:  # Excluir a última coluna (classe) para variáveis categóricas
+# 2. Data Visualization
+# - Graphics to categorical variable counting
+for column in df.columns[:-1]: 
     plt.figure(figsize=(8, 5))
     sns.countplot(x=column, data=df, hue='class')
     plt.title(f'Countplot for {column} vs Class')
@@ -112,8 +104,8 @@ for column in df.columns[:-1]:  # Excluir a última coluna (classe) para variáv
     plt.savefig(os.path.join(countplot_folder, f'countplot_{column}_vs_class.png'))
     plt.close()
 
-# 4. Análise de Outliers
-# - Box plots para cada atributo
+# 4. Outliers Analysis
+# - Box plots for each attributes
 for column in df.columns[:-1]:
     plt.figure(figsize=(8, 5))
     sns.boxplot(x='class', y=column, data=df)
@@ -123,8 +115,8 @@ for column in df.columns[:-1]:
     plt.savefig(os.path.join(boxplot_folder, f'boxplot_{column}_vs_class.png'))
     plt.close()
 
-# 5. Tratamento de Dados Ausentes
-# - Verificando a presença de dados ausentes
+# 5. Missing Data Treatment
+# - Checking missing data presence
 missing_data = df.isnull().sum()
 print("Missing Data:")
 print(missing_data)
@@ -368,27 +360,23 @@ accuracy_percentage_rf = "{:.3%}".format(accuracy_rf)
 print(f'Accuracy: {accuracy_rf}' + ' = ' + f'{accuracy_percentage_rf}')
 print("\n")
 
-# Avaliação do modelo de Random Forest
+# Random Forest model evaluation
 print("Classification Report:")
 classification_report_str = classification_report(y_test, y_pred)
 print(classification_report_str)
 
-# AUC-ROC para um problema de classificação multiclasse
-y_prob = rf_classifier.predict_proba(X_test)  # Probabilidades de classe
+# AUC-ROC for a multi-class classification problem
+y_prob = rf_classifier.predict_proba(X_test)  # Class probability
 auc_roc_rf = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr').round(3)
 print("AUC-ROC:", auc_roc_rf)
 print("\n")
 
-# Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df = pd.read_fwf(StringIO(classification_report_str), index_col=0)
-# Adicionar a coluna com os valores especificados no início da tabela
 classification_report_df.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
-# Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df.columns = ['' if col == 'Header_Column' else col for col in classification_report_df.columns]
-# Substituir "nan" por uma string vazia
 classification_report_df = classification_report_df.fillna('')
 
-# Criar tabela HTML para o relatório de classificação
+# Create an HTML Table for a classification report
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df.values, colLabels=classification_report_df.columns, cellLoc='center', loc='center')
@@ -412,27 +400,23 @@ accuracy_percentage_svm = "{:.3%}".format(accuracy_svm)
 print(f'Accuracy: {accuracy_svm}' + ' = ' + f'{accuracy_percentage_svm}')
 print("\n")
 
-# Avaliação do modelo de Support Vector Machine
+# Support Vector Machine model evaluation
 print("Classification Report:")
 classification_report_str1 = classification_report(y_test, y_pred)
 print(classification_report_str1)
 
-# AUC-ROC para um problema de classificação multiclasse
+# AUC-ROC for a multi-class classification problem
 y_prob = svm_classifier.decision_function(X_test)  # Função de decisão para probabilidades
 auc_roc_svm = roc_auc_score(pd.get_dummies(y_test), y_prob, multi_class='ovr').round(3)
 print("AUC-ROC:", auc_roc_svm)
 print("\n")
 
-# Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df1 = pd.read_fwf(StringIO(classification_report_str1), index_col=0)
-# Adicionar a coluna com os valores especificados no início da tabela
 classification_report_df1.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
-# Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df1.columns = ['' if col == 'Header_Column' else col for col in classification_report_df1.columns]
-# Substituir "nan" por uma string vazia
 classification_report_df1 = classification_report_df1.fillna('')
 
-# Criar tabela HTML para o relatório de classificação
+# Create an HTML Table for a classification report
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df1.values, colLabels=classification_report_df1.columns, cellLoc='center', loc='center')
@@ -443,16 +427,16 @@ plt.close()
 
 print("\n### NEURAL NETWORKS ###")
 
-# Inicializando o modelo MLP
+# MLP model initialization
 mlp_model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, random_state=42)
 
-# Treinando o modelo
+# Model training
 mlp_model.fit(X_train, y_train)
 
-# Fazendo previsões no conjunto de teste
+# Predicting test dataset
 y_pred_mlp = mlp_model.predict(X_test)
 
-# Avaliando o modelo
+# Model Evaluation
 accuracy_mlp = round(accuracy_score(y_test, y_pred_mlp), 3)
 accuracy_percentage_mlp = "{:.3%}".format(accuracy_mlp)
 print(f'Accuracy (MLP): {accuracy_mlp}' + ' = ' + f'{accuracy_percentage_mlp}')
@@ -469,16 +453,12 @@ auc_roc_mlp = roc_auc_score(pd.get_dummies(y_test), y_prob_mlp, multi_class='ovr
 print("AUC-ROC (MLP):", auc_roc_mlp)
 print("\n")
 
-# Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df2 = pd.read_fwf(StringIO(classification_report_str2), index_col=0)
-# Adicionar a coluna com os valores especificados no início da tabela
 classification_report_df2.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
-# Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df2.columns = ['' if col == 'Header_Column' else col for col in classification_report_df2.columns]
-# Substituir "nan" por uma string vazia
 classification_report_df2 = classification_report_df2.fillna('')
 
-# Criar tabela HTML para o relatório de classificação
+# Create an HTML Table for a classification report
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df2.values, colLabels=classification_report_df2.columns, cellLoc='center', loc='center')
@@ -489,16 +469,16 @@ plt.close()
 
 print("\n### DECISION TREES ###")
 
-# Inicializando o modelo de Árvore de Decisão
+# Decision Tree model initialization
 dt_model = DecisionTreeClassifier(random_state=42)
 
-# Treinando o modelo
+# Model training
 dt_model.fit(X_train, y_train)
 
-# Fazendo previsões no conjunto de teste
+# Predicting test dataset
 y_pred_dt = dt_model.predict(X_test)
 
-# Avaliando o modelo
+# Model evaluation
 accuracy_dt = round(accuracy_score(y_test, y_pred_dt), 3)
 accuracy_percentage_dt = "{:.3%}".format(accuracy_dt)
 print(f'Accuracy (Decision Tree): {accuracy_dt}' + ' = ' + f'{accuracy_percentage_dt}')
@@ -510,16 +490,12 @@ classification_report_str3 = classification_report(y_test, y_pred_dt)
 print(classification_report_str3)
 print("\n")
 
-# Converter o relatório de classificação em DataFrame para facilitar a manipulação
 classification_report_df3 = pd.read_fwf(StringIO(classification_report_str3), index_col=0)
-# Adicionar a coluna com os valores especificados no início da tabela
 classification_report_df3.insert(0, 'Header_Column', ['acc', 'good', 'unacc', 'vgood', 'accuracy', 'macro avg', 'weighted avg'])
-# Remover o cabeçalho da coluna 'Header_Column'
 classification_report_df3.columns = ['' if col == 'Header_Column' else col for col in classification_report_df3.columns]
-# Substituir "nan" por uma string vazia
 classification_report_df3 = classification_report_df3.fillna('')
 
-# Criar tabela HTML para o relatório de classificação
+# Create an HTML Table for a classification report
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.axis('off')
 ax.table(cellText=classification_report_df3.values, colLabels=classification_report_df3.columns, cellLoc='center', loc='center')
@@ -593,4 +569,4 @@ for model_name, model in models.items():
     disp.plot(cmap='Blues', values_format='d')
     plt.title(f'Matriz de Confusão - {model_name}')
     plt.savefig(os.path.join(output_directory, f'{model_name}_confusion_matrix.png'))
-    plt.close()  # Close the plot to avoid displaying in the notebook
+    plt.close()  # Close the plot to avoid displaying it
