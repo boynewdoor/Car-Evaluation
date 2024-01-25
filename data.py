@@ -13,6 +13,9 @@ import os
 import numpy as np
 from io import StringIO
 from tabulate import tabulate
+import warnings
+
+warnings.filterwarnings('ignore')
 
 plt.rcParams['figure.max_open_warning'] = 50  # Set the threshold to 50 or a value suitable for your case
 
